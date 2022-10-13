@@ -5,8 +5,6 @@ from selenium.webdriver.common.by import By
 from locators.locators import Locators
 from mytarget.constants import Consts
 
-CLICK_RETRY = 3
-
 
 class MyTarget:
     def __init__(self, driver, url):
@@ -14,9 +12,13 @@ class MyTarget:
         self.url = url
 
     locators = Locators()
+    CLICK_RETRY = 3
 
     def open(self):
         self.driver.get(self.url)
+
+    def change_page(self, url):
+        self.driver.get(url)
 
     def element_is_visible(self, locator, timeout=10):
         return wait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
@@ -48,23 +50,45 @@ class MyTarget:
         self.element_is_visible(self.locators.LOG_EMAIL_INPUT).send_keys(self.email_or_phone)
         self.element_is_visible(self.locators.LOG_EMAIL_PASSWORD).send_keys(self.password)
         self.element_is_clickable(self.locators.LOG_IN_SUBMIT_BTN).click()
+        return self.element_is_visible(self.locators.DASHBOARD_BALANCE)
+
+    def log_in_negative(self, email_or_phone: str = Consts.CORRECT_EMAIL, password: str = Consts.CORRECT_PASSWORD):
+        self.email_or_phone = email_or_phone
+        self.password = password
+
+        self.element_is_clickable(self.locators.LOG_IN_BTN).click()
+        self.element_is_visible(self.locators.LOG_EMAIL_INPUT).send_keys(self.email_or_phone)
+        self.element_is_visible(self.locators.LOG_EMAIL_PASSWORD).send_keys(self.password)
+        self.element_is_clickable(self.locators.LOG_IN_SUBMIT_BTN).click()
+        try:
+            if self.element_is_visible(self.locators.LOG_IN_ERROR, timeout=2) != None:
+                return True
+        except:
+            if self.element_is_visible(self.locators.LOG_ERROR) != None:
+                return True
+            else:
+                return False
+
+
 
     def log_out(self):
-        self.driver.set_window_size(1920, 1080)
-        while self.driver.current_url == Consts.DASHBOARD_URL:
+        for i in range(self.CLICK_RETRY):
             try:
                 self.element_is_clickable(self.locators.DASHBOARD_BALANCE).click()
                 time.sleep(1)
                 self.element_is_visible(self.locators.DASHBOARD_QUIT).click()
             except:
                 pass
+        return self.element_is_clickable(self.locators.ENTER_BTN)
 
     def update_fio(self, fio='Иванов К.С.'):
+        self.change_page(Consts.PROFILE_PAGE)
         self.element_is_visible(self.locators.FIO).clear()
         self.element_is_visible(self.locators.FIO).send_keys(fio)
         self.element_is_clickable(self.locators.PROFILE_SUBMIT).click()
+        self.driver.refresh()
         return self.element_is_present(self.locators.DASHBOARD_USER_NAME).text
 
     def dashboard_navigate(self, dashboard_elem_name):
-        self.driver.set_window_size(1920, 1080)
         self.element_is_clickable((By.CSS_SELECTOR, f'a[class*="center-module-{dashboard_elem_name}"]')).click()
+        return

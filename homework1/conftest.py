@@ -4,11 +4,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from mytarget.mytarget import MyTarget
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-
-
-
 def pytest_addoption(parser):
     parser.addoption('--headless', action='store_true')
 
@@ -21,13 +16,11 @@ def config(request):
 
 @pytest.fixture()
 def driver(config):
+    chrome_options = Options()
     if config['headless'] == True:
-        chrome_options = Options()
         chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(ChromeDriverManager(version='105.0.5195.52').install(),options=chrome_options)
-    else:
-        driver = webdriver.Chrome(ChromeDriverManager(version='105.0.5195.52').install())
-    driver.maximize_window()
+    driver = webdriver.Chrome(ChromeDriverManager(version='105.0.5195.52').install(),options=chrome_options)
+    driver.set_window_size(1920, 1080)
     yield driver
     driver.quit()
 

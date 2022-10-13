@@ -13,38 +13,35 @@ class TestUi:
         """Тест на логин c корректными данными"""
         page = MyTarget(driver, Consts.BASIC_URL)
         page.open()
-        page.log_in()
-        assert driver.current_url == Consts.DASHBOARD_URL, f"LOGIN FAILED with email:{Consts.CORRECT_EMAIL}, password {Consts.CORRECT_PASSWORD}"
+        elem_after_log_in = page.log_in()
+        assert elem_after_log_in != None, f"LOGIN FAILED"
 
     def test_log_out(self, log_in):
         """Тест на лог аут"""
         page = log_in
-        page.log_out()
-        assert log_in.driver.current_url == Consts.BASIC_URL, f"LOGOUT FAILED"
+        enter_btn = page.log_out()
+        assert enter_btn != None, f"LOGOUT FAILED"
 
     def test_log_in_email_without_at(self, driver):
         """Негативный тест на авторизацию (email без @)"""
         EMAIL = 'kirillrespgmail.com'
         page = MyTarget(driver, Consts.BASIC_URL)
         page.open()
-        page.log_in(email_or_phone=EMAIL)
-        assert Consts.BASIC_URL != Consts.DASHBOARD_URL, f"FAILED LOGIN with email:{EMAIL}, password {Consts.CORRECT_PASSWORD}"
+        error = page.log_in_negative(email_or_phone=EMAIL)
+        assert error == True, f"FAILED LOGIN with email:{EMAIL}, password {Consts.CORRECT_PASSWORD}"
 
     def test_log_in_email_with_incorrect_pass(self, driver):
         """Негативный тест на авторизацию c неверным паролем"""
         password = '1'
         page = MyTarget(driver, Consts.BASIC_URL)
         page.open()
-        page.log_in(password=password)
-        page.check_invalid_log_out_msg()
-        assert Consts.BASIC_URL != Consts.DASHBOARD_URL, f"FAILED LOGIN with email:{Consts.CORRECT_EMAIL}, password {password}"
+        error = page.log_in_negative(password=password)
+        assert error == True, f"FAILED LOGIN with email:{Consts.CORRECT_EMAIL}, password {password}"
 
-    def test_change_contact_info(self, driver, log_in, data='Кирилл'):
+    def test_change_contact_info(self, log_in, data='Кирилл'):
         """Тест на редактирование поля ФИО в профиле"""
-        page = MyTarget(driver, 'https://target-sandbox.my.com/profile/contacts')
-        page.open()
+        page = log_in
         result = page.update_fio(data)
-        driver.refresh()
         assert result.lower() == data.lower(), f"New input data: {data.lower()}, but actual data: {result.lower()}"
 
     @pytest.mark.parametrize(
