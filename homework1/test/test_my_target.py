@@ -13,30 +13,26 @@ class TestUi:
         """Тест на логин c корректными данными"""
         page = MyTarget(driver, Consts.BASIC_URL)
         page.open()
-        elem_after_log_in = page.log_in()
-        assert elem_after_log_in != None, f"LOGIN FAILED"
+        assert page.log_in(), f"LOGIN FAILED"
 
     def test_log_out(self, log_in):
         """Тест на лог аут"""
         page = log_in
-        enter_btn = page.log_out()
-        assert enter_btn != None, f"LOGOUT FAILED"
+        assert page.log_out(), f"LOGOUT FAILED"
 
     def test_log_in_email_without_at(self, driver):
         """Негативный тест на авторизацию (email без @)"""
         EMAIL = 'kirillrespgmail.com'
         page = MyTarget(driver, Consts.BASIC_URL)
         page.open()
-        error = page.log_in_negative(email_or_phone=EMAIL)
-        assert error == True, f"FAILED LOGIN with email:{EMAIL}, password {Consts.CORRECT_PASSWORD}"
+        assert page.log_in_negative(email_or_phone=EMAIL), f"FAILED LOGIN with email:{EMAIL}, password {Consts.CORRECT_PASSWORD}"
 
     def test_log_in_email_with_incorrect_pass(self, driver):
         """Негативный тест на авторизацию c неверным паролем"""
         password = '1'
         page = MyTarget(driver, Consts.BASIC_URL)
         page.open()
-        error = page.log_in_negative(password=password)
-        assert error == True, f"FAILED LOGIN with email:{Consts.CORRECT_EMAIL}, password {password}"
+        assert page.log_in_negative(password=password), f"FAILED LOGIN with email:{Consts.CORRECT_EMAIL}, password {password}"
 
     def test_change_contact_info(self, log_in, data='Кирилл'):
         """Тест на редактирование поля ФИО в профиле"""
