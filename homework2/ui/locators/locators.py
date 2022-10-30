@@ -30,6 +30,7 @@ class Dashboard(MyTargetBase):
     SAVE_PICTURE = (By.CSS_SELECTOR, 'input[data-translated-lit*="Save image"]')
     INPUT_CAMPAIGN_NAME = (By.CSS_SELECTOR, 'div[class*="bottom"] input[class*="input__inp js-form"]')
     SUBMIT_CREATE_CAMPAIGN = (By.CSS_SELECTOR, 'div[class*="footer__button"] button')
+    SEARCH_CAMPAIGN_INPUT = (By.CSS_SELECTOR, 'input[class*="searchInput"]')
 
 class Segments(MyTargetBase):
     CREATE_SEGMENTS_WHEN_ZERO_SEGMENTS = (By.CSS_SELECTOR, 'a[href*="segments_list/new"]')
@@ -40,16 +41,19 @@ class Segments(MyTargetBase):
     ADD_SEGMENT_BTN = (By.CSS_SELECTOR, 'div[class*="js-add-button"]')
     INPUT_SEGMENT_NAME = (By.CSS_SELECTOR, 'div[class*="create-segment-form"] input[maxlength="60"]')
     FINAL_ADD_SEGMENT_BTN = (By.XPATH, '//div[@class="create-segment-form"]//*[@class="button__text"]')
+    SEARCH_SEGMENT_INPUT = (By.CSS_SELECTOR, 'input[class*="searchInput"]')
 
     SOURCE_HEADER_WITH_CHECKBOX = (By.XPATH, '//div[contains(@class, "source__header")]')
     DATA_SOURCE_GROUPS_OK_AND_VK = (By.CSS_SELECTOR, 'a[href="/segments/groups_list"]')
     OK_AND_VK_INPUT = (By.CSS_SELECTOR, 'input[class*="searchInput"]')
-    OK_AND_VK_INPUT_VK_GROUPS_SHOW_ALL = (By.XPATH, '//span[contains(text(),"(VK)")]/following::*[@data-test="show"]')
+    OK_AND_VK_INPUT_OK_GROUPS_SHOW_ALL = (By.XPATH, '//span[contains(text(),"(ОК)")]/following::*[@data-test="show"]')
     SELECT_GROUP = (By.CSS_SELECTOR, 'li[class*="optionsList"]')
     ADD_SELECTED_DATA_SOURCE_BTN = (By.CSS_SELECTOR, 'div[data-test="add_selected_items_button"]')
     INPUT_FIND_TO_DELETE_DATA_SOURCE = (By.CSS_SELECTOR, 'input[class*="suggester-ts__input"]')
     REMOVE = (By.CSS_SELECTOR, 'div[data-class-name="RemoveView"]')
     CONFIRM_REMOVE = (By.CSS_SELECTOR, 'button[class*="confirm-remove"]')
+    SEARCH_DATA_SOURCE_INPUT = (By.CSS_SELECTOR, 'input[class*="suggester-ts__input"]')
+    CHECK_DATA_SOURCE_INPUT = (By.XPATH, '//span[contains(text(), "Ничего") or contains(text(), "Nothing" )]')
 
     class categories:
         APPS_AND_GAMES = (By.XPATH,

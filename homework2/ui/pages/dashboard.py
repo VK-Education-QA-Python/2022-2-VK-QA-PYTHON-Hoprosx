@@ -1,9 +1,12 @@
 import os
 import random
 import time
+import uuid
 
 import allure
 import pytest
+from selenium.common import TimeoutException
+from selenium.webdriver.common.by import By
 
 from ui.locators.locators import Dashboard
 from ui.pages.base_my_target import BaseMyTargetPage
@@ -49,9 +52,8 @@ class DashboardPage(BaseMyTargetPage):
         self.element_is_clickable(self.locators.SAVE_PICTURE).click()
 
     @allure.step('Имя компании')
-    def set_campaign_name(self, name:str="Моя кампания для второго дз") -> str:
-        id = str(random.randint(1, 9999999))
-        campaign_name = name + ' ' + id
+    def set_campaign_name(self) -> str:
+        campaign_name = str(uuid.uuid1())
         self.element_is_clickable(self.locators.INPUT_CAMPAIGN_NAME).clear()
         self.element_is_clickable(self.locators.INPUT_CAMPAIGN_NAME).send_keys(campaign_name)
         return campaign_name
@@ -60,7 +62,7 @@ class DashboardPage(BaseMyTargetPage):
     def submit_campaign_creation(self):
         self.element_is_clickable(self.locators.SUBMIT_CREATE_CAMPAIGN).click()
 
-    def create_campaign_with_banner_type(self, link,picture_path:str, budget_per_day:int|float=100, budget_total:int|float=20000) -> str:
+    def create_campaign_with_banner_type(self, link, picture_path:str, budget_per_day:int|float=100, budget_total:int|float=20000) -> str:
         self.create_campaign()
         self.select_purpose_of_campaign(self.locators.REACH)
         self.add_link_to_create_campaign(link)
@@ -70,9 +72,11 @@ class DashboardPage(BaseMyTargetPage):
         self.add_picture_200x400(picture_path)
         campaign_name = self.set_campaign_name()
         self.submit_campaign_creation()
+        self.refresh()
         return campaign_name
 
-
-
-
-
+    @allure.step('Поиск кампании')
+    def check_campaign(self, campaign_name:str):
+        self.element_is_clickable(self.locators.SEARCH_CAMPAIGN_INPUT).send_keys(campaign_name)
+        self.element_is_clickable((By.XPATH, f'//li[@title="{campaign_name}"]')).click()
+        return self.element_is_clickable((By.XPATH, f'//a[@title="{campaign_name}"]'))

@@ -50,8 +50,6 @@ def driver(config, temp_dir):
         )
     elif browser == 'chrome':
         driver = webdriver.Chrome(executable_path=ChromeDriverManager(version='105.0.5195.52').install(), options=options)
-    elif browser == 'firefox':
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
     else:
         raise RuntimeError(f'Unsupported browser: "{browser}"')
     driver.get(url)
@@ -61,13 +59,10 @@ def driver(config, temp_dir):
 
 @pytest.fixture()
 @allure.step('Логин')
-def log_in(driver):
+def log_in(driver, credentials):
     page = BaseMyTargetPage(driver)
     page.open()
-    page.log_in(email_or_phone='Kirillresp74@gmail.com', password='245245wQ')
-    # задал дополнительно статично,чтобы проходили на другой машине
-    # если не задавать,то метод прочитает их из файла
-    # по идее файл должен лежать вне, но для удобства тут оставил
+    page.log_in(*credentials)
     return page
 
 
@@ -83,3 +78,15 @@ def segments_page(driver):
 @pytest.fixture()
 def file_path_picture(repo_root):
     return os.path.join(repo_root, 'files', 'img.png')
+
+@pytest.fixture()
+def path_for_credentials(repo_root):
+    return os.path.join(repo_root, 'files', 'userdata')
+
+@pytest.fixture()
+def credentials(path_for_credentials):
+    with open(path_for_credentials, 'r') as f:
+        user = f.readline().strip()
+        password = f.readline().strip()
+
+    return user, password

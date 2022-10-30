@@ -29,10 +29,6 @@ class BaseMyTargetPage:
     def change_page(self, url):
         self.driver.get(url)
 
-    @allure.step('Сохранить скрин')
-    def save_screen(self, name, path:str=r'C:\Users\Farrien\Desktop\2022-2-VK-QA-PYTHON-Hoprosx\homework2\files\\'):
-        self.driver.save_screenshot(path + name + '.png')
-
     def element_is_visible(self, locator, timeout=10):
         return wait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
 
@@ -53,21 +49,7 @@ class BaseMyTargetPage:
 
     def log_in(self, email_or_phone=False, password=False):
         """Что бы логин можно было использовать в негативных кейсах"""
-        if email_or_phone == False:
-            with open(r'C:\Users\Farrien\Desktop\2022-2-VK-QA-PYTHON-Hoprosx\homework2\files\userdata',
-                      'r') as f:
-                self.email_or_phone = f.readline().strip()
-        else:
-            self.email_or_phone = email_or_phone
-        if password == False:
-            with open(r'C:\Users\Farrien\Desktop\2022-2-VK-QA-PYTHON-Hoprosx\homework2\files\userdata',
-                      'r') as f:
-                f.readline()
-                self.password = f.readline().strip()
-        else:
-            self.password = password
-
         self.element_is_clickable(self.locators.LOG_IN_BTN).click()
-        self.element_is_visible(self.locators.LOG_EMAIL_INPUT).send_keys(self.email_or_phone)
-        self.element_is_visible(self.locators.LOG_EMAIL_PASSWORD).send_keys(self.password)
+        self.element_is_visible(self.locators.LOG_EMAIL_INPUT).send_keys(email_or_phone)
+        self.element_is_visible(self.locators.LOG_EMAIL_PASSWORD).send_keys(password)
         self.element_is_clickable(self.locators.LOG_IN_SUBMIT_BTN).click()

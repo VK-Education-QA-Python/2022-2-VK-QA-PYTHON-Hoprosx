@@ -1,5 +1,6 @@
 import random
 import time
+import uuid
 
 import allure
 
@@ -43,7 +44,7 @@ class SegmentsPage(BaseMyTargetPage):
         self.element_is_visible(self.locators.INPUT_SEGMENT_NAME).clear()
         self.element_is_visible(self.locators.INPUT_SEGMENT_NAME).send_keys(segment_name)
 
-    def create_segment(self, segments_name: str = 'Мой сегмент для второго дз', segments_category: tuple = None,
+    def create_segment(self, segments_category: tuple = None,
                        check_box_name: str = None):
         """
         Метод для создания сегмента
@@ -51,11 +52,9 @@ class SegmentsPage(BaseMyTargetPage):
         :param segments_name: Имя сегмента
         :param segments_category: Категория сегмента, локатор
         :param check_box_name: Чекбокc: по дефолту выбирается главный, можно искать по неполному вхождению
-        :return:
         """
-        id = str(random.randint(1, 9999999))
-        final_segment_name = segments_name + ' ' + id
-        NEW_SEGMENTS_LOCATOR = (By.CSS_SELECTOR, f'a[title="{final_segment_name}"]')
+        segment_name = str(uuid.uuid1())
+        NEW_SEGMENTS_LOCATOR = (By.CSS_SELECTOR, f'a[title="{segment_name}"]')
         self.create_segment_button()
         self.select_segment_category(segments_category)
         if check_box_name is not None:
@@ -63,21 +62,40 @@ class SegmentsPage(BaseMyTargetPage):
         else:
             self.element_is_visible(self.locators.CHECKBOX).click()
         self.add_segment_btn()
-        self.set_segment_name(final_segment_name)
+        self.set_segment_name(segment_name)
         self.element_is_clickable(self.locators.FINAL_ADD_SEGMENT_BTN).click()
         new_segment_elem = self.element_is_present(NEW_SEGMENTS_LOCATOR)
-        return new_segment_elem
+        return segment_name
 
     @allure.step('удаление сегмента')
-    def delete_segment(self, segments_elem):
-        segments_elem.find_element('xpath', '//*[contains(@data-test, "remove")]').click()
-        self.element_is_clickable(self.locators.CONFIRM_REMOVE).click()
-        return True
+    def delete_segment(self, segments_name):
+        segment_elem = self.element_is_visible((By.CSS_SELECTOR, f'a[title="{segments_name}"]'))
+        segment_elem.find_element('xpath', '//*[contains(@data-test, "remove")]').click()
+        return self.element_is_clickable(self.locators.CONFIRM_REMOVE).click()
+
+    @allure.step('Поиск сегмента')
+    def check_segment(self, segment_name:str):
+        """Комплексная проверка
+        1) проверка наличия сегмента в инпуте
+        2) проверка что такой сегмент в инпуте один
+        3) проверка сегмента в списке сегментов
+        """
+        self.element_is_clickable(self.locators.SEARCH_SEGMENT_INPUT).send_keys(segment_name)
+        try:
+            if len(self.element_are_present((By.CSS_SELECTOR, f'li[title="{segment_name}"]'))) == 1:
+                self.element_is_clickable((By.CSS_SELECTOR, f'li[title="{segment_name}"]')).click()
+            else:
+                raise Exception(f'Сегментов с {segment_name} более одного')
+        except TimeoutException:
+            return False
+        #try - чтобы корректно выводилось описание ошибки в ассерте если тест падает раньше
+        #решил в этом методе попробовать учесть все
+        return self.element_is_clickable((By.CSS_SELECTOR, f'a[title="{segment_name}"]'))
 
     def add_OK_and_VK_link_data_source(self, link):
         self.element_is_clickable(self.locators.DATA_SOURCE_GROUPS_OK_AND_VK).click()
         self.element_is_clickable(self.locators.OK_AND_VK_INPUT).send_keys(link)
-        self.element_is_clickable(self.locators.OK_AND_VK_INPUT_VK_GROUPS_SHOW_ALL).click()
+        self.element_is_clickable(self.locators.OK_AND_VK_INPUT_OK_GROUPS_SHOW_ALL).click()
         group_name = self.element_is_clickable(self.locators.SELECT_GROUP).text
         self.element_is_clickable(self.locators.SELECT_GROUP).click()
         self.element_is_clickable(self.locators.ADD_SELECTED_DATA_SOURCE_BTN).click()
@@ -91,11 +109,14 @@ class SegmentsPage(BaseMyTargetPage):
     def delete_selecting_data_source(self):
         self.element_is_clickable(self.locators.REMOVE).click()
         self.element_is_clickable(self.locators.CONFIRM_REMOVE).click()
-        self.refresh()
 
-    def delete_OK_and_VK_segments_data_source(self, group_name):
+    def delete_OK_and_VK_segments_data_source(self, group_name:str):
         if self.driver.current_url != self.url:
             self.open()
         self.element_is_clickable(self.locators.DATA_SOURCE_GROUPS_OK_AND_VK).click()
         self.find_existing_data_source(group_name)
         self.delete_selecting_data_source()
+
+    def check_OK_and_VK_segments_data_source(self, group_name:str):
+        self.element_is_clickable(self.locators.SEARCH_DATA_SOURCE_INPUT).send_keys(group_name)
+        return self.element_is_present(self.locators.CHECK_DATA_SOURCE_INPUT)
