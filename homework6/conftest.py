@@ -18,3 +18,4 @@ def mysql_client(request) -> MysqlClient:
     client = request.config.mysql_client
     yield client
     client.connection.close()
+
