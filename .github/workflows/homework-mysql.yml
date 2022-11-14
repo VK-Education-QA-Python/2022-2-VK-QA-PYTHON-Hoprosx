@@ -2,12 +2,12 @@ name: MySQL Homework
 on:
   push:
     branches:
-      - 'homework61'
+      - 'homework6'
   workflow_dispatch:
 jobs:
   MySQLHomework:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/homework61'
+    if: github.ref == 'refs/heads/homework6'
     timeout-minutes: 5
     env:
       MYSQL_ROOT_PASSWORD: pass
