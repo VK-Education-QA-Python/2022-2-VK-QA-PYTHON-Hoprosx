@@ -39,3 +39,4 @@ else:
             result_file.write(row)
 
 print('Успешно, результат сохранен в файле: ' + result_file_name)
+

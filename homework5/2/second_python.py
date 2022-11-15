@@ -42,3 +42,4 @@ else:
         result_file.write(put + '\n')
 
 print('Успешно, результат сохранен в файле:', result_file_name)
+
