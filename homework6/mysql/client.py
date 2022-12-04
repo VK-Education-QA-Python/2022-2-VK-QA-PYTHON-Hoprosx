@@ -1,7 +1,6 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
-from models.requests import Base
-
+from models.requests import *
 
 class MysqlClient:
 
@@ -30,32 +29,28 @@ class MysqlClient:
         self.execute_query(f'DROP database IF EXISTS {self.db_name}')
         self.execute_query(f'CREATE database {self.db_name}')
 
-    def create_table_counted_requests(self):
-        if not sqlalchemy.inspect(self.engine).has_table('counted_requests'):
-            Base.metadata.tables['counted_requests'].create(self.engine)
+    def create_table(self, model):
+        if not sqlalchemy.inspect(self.engine).has_table(model.__tablename__):
+            Base.metadata.tables[model.__tablename__].create(self.engine)
 
-    def create_table_counted_requests_by_type(self):
-        if not sqlalchemy.inspect(self.engine).has_table('counted_requests_by_type'):
-            Base.metadata.tables['counted_requests_by_type'].create(self.engine)
-
-    def create_table_popular_requests(self):
-        if not sqlalchemy.inspect(self.engine).has_table('popular_requests'):
-            Base.metadata.tables['popular_requests'].create(self.engine)
-
-    def create_table_4xx_requests(self):
-        if not sqlalchemy.inspect(self.engine).has_table('big_4XX_requests'):
-            Base.metadata.tables['big_4XX_requests'].create(self.engine)
-
-    def create_table_5xx_requests(self):
-        if not sqlalchemy.inspect(self.engine).has_table('5XX_requests'):
-            Base.metadata.tables['5XX_requests'].create(self.engine)
+    def drop_table(self, model):
+        if sqlalchemy.inspect(self.engine).has_table(model.__tablename__):
+            self.session.query(model).delete()
+            self.session.commit()
 
     def create_all_schema(self):
-        self.create_table_counted_requests()
-        self.create_table_counted_requests_by_type()
-        self.create_table_popular_requests()
-        self.create_table_4xx_requests()
-        self.create_table_5xx_requests()
+        self.create_table(CountedRequestsModel)
+        self.create_table(CountedRequestsByTypeModel)
+        self.create_table(PopularRequestsModel)
+        self.create_table(Big4XXRequestsModel)
+        self.create_table(Users5XXRequestsModel)
+
+    def drop_all_tables(self):
+        self.drop_table(CountedRequestsModel)
+        self.drop_table(CountedRequestsByTypeModel)
+        self.drop_table(PopularRequestsModel)
+        self.drop_table(Big4XXRequestsModel)
+        self.drop_table(Users5XXRequestsModel)
 
     def execute_query(self, query, fetch=False):
         res = self.connection.execute(query)

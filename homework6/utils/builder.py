@@ -9,19 +9,16 @@ class MysqlTableBuilder:
 
     def create_counted_requests(self):
         """Заполнение таблицы counted_requests"""
-        result_file_path = count_all_requests()
-        with open(result_file_path, 'r') as file:
-            data = file.read()
-            data = json.loads(data)
+        data = count_all_requests()
+        # with open(result_file_path, 'r') as file:
+        #     data = file.read()
+        #     data = json.loads(data)
 
         self.client.execute_query(f'insert into `counted_requests` (`amount`) values ("{data["AMOUNT"]}")')
 
     def create_counted_requests_by_type(self):
         """Заполнение таблицы counted_requests_by_type"""
-        result_file_path = types_of_requests()
-        with open(result_file_path, 'r') as file:
-            data = file.read()
-            data = json.loads(data)
+        data = types_of_requests()
 
         for row in data.items():
             self.client.execute_query(f"""insert into `counted_requests_by_type` (`type`, `amount`)
@@ -29,10 +26,7 @@ class MysqlTableBuilder:
 
     def create_popular_requests(self):
         """Заполнение таблицы popular_requests"""
-        result_file_path = top_ten_popular_requests()
-        with open(result_file_path, 'r') as file:
-            data = file.read()
-            data = json.loads(data)
+        data = top_ten_popular_requests()
 
         for row in data.values():
             self.client.execute_query(f"""insert into `popular_requests` (`url`, `amount`)
@@ -40,10 +34,7 @@ class MysqlTableBuilder:
 
     def create_4xx_requests(self):
         """Заполнение таблицы big_4XX_requests"""
-        result_file_path = top_five_big_requests_with_4xx_status_code()
-        with open(result_file_path, 'r') as file:
-            data = file.read()
-            data = json.loads(data)
+        data = top_five_big_requests_with_4xx_status_code()
 
         for row in data.values():
             self.client.execute_query(f"""insert into `big_4XX_requests` (`url`, `status_code`, `size`, `ip` )
@@ -51,10 +42,7 @@ class MysqlTableBuilder:
 
     def create_5xx_requests(self):
         """Заполнение таблицы 5XX_requests"""
-        result_file_path = top_five_users_with_5xx_status_code_requests()
-        with open(result_file_path, 'r') as file:
-            data = file.read()
-            data = json.loads(data)
+        data = top_five_users_with_5xx_status_code_requests()
 
         for row in data.values():
             self.client.execute_query(f"""insert into `5XX_requests` (`ip`, `amount`)
@@ -67,3 +55,4 @@ class MysqlTableBuilder:
         self.create_popular_requests()
         self.create_4xx_requests()
         self.create_5xx_requests()
+
