@@ -105,4 +105,4 @@ class TestLogic(BaseUi):
         with allure.step('Проверка поля active = 0'):
             assert self.db.get_table_test_users(username=user.username,
                                                 password=user.password)[0].active == 0, \
-                f'Пользователь username f{user.username} после блокировки имеет статус active 0'
+                f'Пользователь username f{user.username} после блокировки имеет статус active 1'

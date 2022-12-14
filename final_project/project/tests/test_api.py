@@ -265,7 +265,7 @@ class TestApi(BaseApi):
                     .assert_status_code(200)
             except AssertionError:
                 assert self.db.get_table_test_users(username=username)[0].password == password
-                assert False
+                assert False, f'Пароль был изменен, но получили не корректный ответ'
 
     @allure.title('Смена пароля несуществующего пользователя API')
     def test_change_password_user_not_exist(self):
